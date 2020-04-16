@@ -44,10 +44,10 @@ namespace NavtehAssignment
                             .Remove(previousLine != null ? previousLine.Length + i : i, substringLength);
 
                         // if text contains substring at least once, then add
-                        if (textFileContentSubstring.Contains(substring, StringComparison.OrdinalIgnoreCase))
+                        if (textFileContentSubstring.Contains(substring))
                         {
                             // check if already exists and add
-                            if (!tempList.Contains(substring, StringComparison.OrdinalIgnoreCase))
+                            if (!tempList.Contains(substring))
                                 tempList.Add(substring);
                         }
                     }
