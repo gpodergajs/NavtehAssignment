@@ -8,7 +8,6 @@ namespace NavtehAssignment.src._utils
 
         public static string[] ReadFileLines(string path)
         {
-            path = "C:\\Users\\gpode\\Desktop\\txt\\test.txt";
 
             try
             {
@@ -25,7 +24,7 @@ namespace NavtehAssignment.src._utils
 
         public static string ReadFile(string path)
         {
-             path = "C:\\Users\\gpode\\Desktop\\txt\\test.txt";
+
              try
              {
                 if (!File.Exists(path)) throw new FileNotFoundException();
