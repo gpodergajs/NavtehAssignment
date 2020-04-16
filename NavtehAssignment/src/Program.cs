@@ -74,14 +74,21 @@ namespace NavtehAssignment
                 // end of initial loop
             }
 
-            // TODO remove overlapped strings 
+            var resultList = new List<List<string>>();            
             foreach(var listItem in substringList)
             {
-
+                resultList.Add(new List<string>(ListUtil.RemoveOverlappedStrings(ListUtil.OrderByLength(listItem))));                
             }
 
-
-
+            foreach(var listItem in resultList)
+            {                
+                Console.Write("[");                
+                foreach(var item in listItem)
+                {
+                    if (listItem.Last() != item) Console.Write($"{item.ToString()},"); else Console.Write($"{item.ToString()}");                   
+                }
+                Console.WriteLine("]");                
+            }
         }
     }
 }
