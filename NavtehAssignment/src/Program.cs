@@ -44,7 +44,7 @@ namespace NavtehAssignment
                             .Remove(previousLine != null ? previousLine.Length + i : i, substringLength);
 
                         // if text contains substring at least once, then add
-                        if (textFileContentSubstring.Contains(substring))
+                        if (textFileContentSubstring.Contains(substring, StringComparison.OrdinalIgnoreCase))
                         {
                             // check if already exists and add
                             if (!tempList.Contains(substring))
