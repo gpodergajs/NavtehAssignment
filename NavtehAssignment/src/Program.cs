@@ -30,13 +30,8 @@ namespace NavtehAssignment
             }
             catch (Exception e)
             {
-                if(e.InnerException is FileNotFoundException)
-                {
-                    Console.WriteLine(e.Message);
-                    return;
-                }
-
-                Console.WriteLine(e.Message);                
+                Console.WriteLine(e.Message);
+                return;
             }          
         }
 
