@@ -197,8 +197,13 @@ namespace NavtehAssignment
                 default: Console.WriteLine("Sword of a thousand truths"); break; 
             }
 
+            
+
+
             foreach (var listItem in resultList)
             {
+                if (listItem.Count == 0) continue;
+
                 sb.Append("[");                
                 foreach (var item in listItem)
                 {
