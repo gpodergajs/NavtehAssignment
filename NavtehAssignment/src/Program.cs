@@ -120,21 +120,24 @@ namespace NavtehAssignment
 
                 var lineSize = line.Length;
                 var tempList = new List<string>();
-
-                for (int substringLength = 4; substringLength < textFileContent.Length; substringLength++)
+                
+                for (int substringLength = 4; substringLength < line.Length; substringLength++)
                 {
-
                     for (int i = 0; i < lineSize; i++)
                     {
                         if (i + substringLength >= lineSize) break;
 
                         var substring = line.Substring(i, substringLength);
                         // dodaj : če obstaja previous line, vzemi njegov size + i in začni od tukaj removat
-                        var textFileContentSubstring = textFileContent
+                        /*
+                         * var textFileContentSubstring = textFileContent
                             .Remove(previousLine != null ? previousLine.Length + i : i, substringLength);
+                            */
+                        var lineContentSubstring = line.Remove(i,substringLength);
+
 
                         // if text contains substring at least once, then add
-                        if (textFileContentSubstring.Contains(substring, StringComparison.OrdinalIgnoreCase))
+                        if (lineContentSubstring.Contains(substring, StringComparison.OrdinalIgnoreCase))
                         {
                             // check if already exists and add
                             if (!tempList.Contains(substring))
@@ -145,7 +148,7 @@ namespace NavtehAssignment
                     // if the temp list is empty no substrings were found so we go to the new line
                     if (tempList.Count == 0)
                     {
-                        previousLine = line;
+                        //previousLine = line;
                         break;
                     }
 
