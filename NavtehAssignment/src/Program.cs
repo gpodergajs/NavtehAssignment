@@ -43,20 +43,19 @@ namespace NavtehAssignment
         private static void FromBiggestToSmallest()
         {
 
+            string[] textFileLines = new string[_textFileLines.Length];
+            // string comparison is bugged, so we lowercase the strings
+            for(int i = 0; i < textFileLines.Length; i++)
+            {
+                textFileLines[i] = _textFileLines[i].Trim().ToLowerInvariant();
+            }
             
-            var textFileLines = _textFileLines;
-            //var textFileContent = _textFileContent.ToLowerInvariant();
-
             List<string> substringList_line = new List<string>();
             List<List<string>> substringList = new List<List<string>>();
             string previousLine = String.Empty;
 
             foreach (var line in textFileLines)
-            {                
-                // remove uncecessary characters
-                line.Trim();
-                
-
+            {
                 var lineSize = line.Length;
                 var tempList = new List<string>();
 
@@ -111,8 +110,12 @@ namespace NavtehAssignment
 
         private static void FromSmallestToBiggest()
         {
-            var textFileLines = _textFileLines;
-            var textFileContent = _textFileContent;
+            string[] textFileLines = new string[_textFileLines.Length];
+            // string comparison is bugged, so we lowercase the strings
+            for (int i = 0; i < textFileLines.Length; i++)
+            {
+                textFileLines[i] = _textFileLines[i].Trim().ToLowerInvariant();
+            }
 
             // init variables
             List<string> substringList_line = new List<string>();
@@ -149,7 +152,7 @@ namespace NavtehAssignment
                         var lineContentSubstring = line.Remove(i,substringLength);
 
                         // if text contains substring at least once, then add
-                        if (lineContentSubstring.Contains(substring, StringComparison.OrdinalIgnoreCase))
+                        if (lineContentSubstring.ToLowerInvariant().Contains(substring.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase))
                         {
                             // check if already exists and add
                             // TODO: we could add the overlap check here to optimize algo
