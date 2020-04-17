@@ -42,8 +42,10 @@ namespace NavtehAssignment
 
         private static void FromBiggestToSmallest()
         {
+
+            
             var textFileLines = _textFileLines;
-            var textFileContent = _textFileContent;
+            //var textFileContent = _textFileContent.ToLowerInvariant();
 
             List<string> substringList_line = new List<string>();
             List<List<string>> substringList = new List<List<string>>();
@@ -53,17 +55,23 @@ namespace NavtehAssignment
             {                
                 // remove uncecessary characters
                 line.Trim();
+                
 
                 var lineSize = line.Length;
                 var tempList = new List<string>();
 
                 // we begin with the biggest substring length
-                for (int substringLength = textFileContent.Length; substringLength > 0; substringLength--)
+                for (int substringLength = line.Length; substringLength > 0; substringLength--)
                 {
                     // if smaller than 4 we go to next line and save all the substrigs
+
+                    // if the substring length is bigger than half of the line, we stop searching
+                    // substring cannot be bigger than main string
+                    // we continue, because we go from bigest to smallest
+                    if (substringLength > line.Length+1 / 2) continue;
+
                     if (substringLength < 4)
                     {
-                        previousLine = line;
                         substringList.Add(new List<string>(tempList));
                         tempList.Clear();
                         break;
@@ -78,16 +86,16 @@ namespace NavtehAssignment
 
                         // the beggining substring is the whole line
                         var substring = line.Substring(i, substringLength);
-
-                        var textFileContentSubstring = textFileContent
-                         .Remove(previousLine != null ? previousLine.Length + i : i, substringLength);
-
+                        
+                        // we remove the substring from the line text (so we dont get a match with the same substring) 
+                        var lineContentSubstring = line.Remove(i, substringLength);
 
                         // if text contains substring at least once, then add
-                        if (textFileContentSubstring.Contains(substring, StringComparison.OrdinalIgnoreCase))
+                        if (lineContentSubstring.Contains(substring, StringComparison.OrdinalIgnoreCase))
                         {
                             if (!tempList.Contains(substring))
                             {
+                                // TODO: you could the overlap check here to optimize algo
                                 substringList_line.Add(substring);
                                 tempList.Add(substring);
                             }
@@ -109,7 +117,7 @@ namespace NavtehAssignment
             // init variables
             List<string> substringList_line = new List<string>();
             List<List<string>> substringList = new List<List<string>>();
-            string previousLine = String.Empty;
+            string previousLine = string.Empty;
 
             foreach (var line in textFileLines)
             {
@@ -117,29 +125,34 @@ namespace NavtehAssignment
                 substringList_line.Clear();
                 // remove uncecessary characters
                 line.Trim();
+                
 
                 var lineSize = line.Length;
                 var tempList = new List<string>();
                 
                 for (int substringLength = 4; substringLength < line.Length; substringLength++)
                 {
+           
+                    // if the substring length is bigger than half of the line, we stop searching
+                    // substring cannot be bigger than main string
+                    // we break, because we go from smallest to biggest
+                    if (substringLength > line.Length+1 / 2) break;
+
                     for (int i = 0; i < lineSize; i++)
                     {
                         if (i + substringLength >= lineSize) break;
 
-                        var substring = line.Substring(i, substringLength);
-                        // dodaj : če obstaja previous line, vzemi njegov size + i in začni od tukaj removat
-                        /*
-                         * var textFileContentSubstring = textFileContent
-                            .Remove(previousLine != null ? previousLine.Length + i : i, substringLength);
-                            */
-                        var lineContentSubstring = line.Remove(i,substringLength);
+                        // create the substring we are searching for
+                        var substring = line.Substring(i, substringLength);                     
 
+                        // remove the substring from the list so
+                        var lineContentSubstring = line.Remove(i,substringLength);
 
                         // if text contains substring at least once, then add
                         if (lineContentSubstring.Contains(substring, StringComparison.OrdinalIgnoreCase))
                         {
                             // check if already exists and add
+                            // TODO: we could add the overlap check here to optimize algo
                             if (!tempList.Contains(substring))
                                 tempList.Add(substring);
                         }
@@ -148,7 +161,6 @@ namespace NavtehAssignment
                     // if the temp list is empty no substrings were found so we go to the new line
                     if (tempList.Count == 0)
                     {
-                        //previousLine = line;
                         break;
                     }
 
