@@ -27,7 +27,7 @@ namespace NavtehAssignment
                 _textFileContent = FileUtil.ReadFile(input).Trim();             
                 
                 FromBiggestToSmallest();
-                //FromSmallestToBiggest();
+                FromSmallestToBiggest();
 
             }
             catch (Exception e)
@@ -58,14 +58,14 @@ namespace NavtehAssignment
                 // we begin with the biggest substring length
                 for (int substringLength = line.Length; substringLength > 0; substringLength--)
                 {
-                    // if smaller than 4 we go to next line and save all the substrigs
+                  
 
                     /// if the substring length is bigger than half of the line, we stop searching
                     /// substring cannot be bigger than main string
                     /// we continue, because we go from bigest to smallest
                     if (substringLength > line.Length+1 / 2) continue;
 
-                    // if under the threshold - stop
+                    // if under the threshold - stop and go to next line
                     if (substringLength < 4)
                     {
     
@@ -98,7 +98,7 @@ namespace NavtehAssignment
                             /// we go through all the items in the dictionary
                             /// we check if it occurs more times than any other item
                             /// if it occurs more times, we add
-                            foreach (var kvPair in new Dictionary<string, int>(substringOverlapDictionary.OrderBy(x => x.Key.Length)))
+                            foreach (var kvPair in new Dictionary<string, int>(substringOverlapDictionary))
                             {
                                 var key = kvPair.Key;
                                 var value = kvPair.Value;
@@ -127,73 +127,56 @@ namespace NavtehAssignment
         private static void FromSmallestToBiggest()
         {
             string[] textFileLines = new string[_textFileLines.Length];
+            
             // string comparison is bugged, so we lowercase the strings
             for (int i = 0; i < textFileLines.Length; i++)
             {
                 textFileLines[i] = _textFileLines[i].Trim().ToLowerInvariant();
-            }
-
-            // init variables
-            List<string> substringList_line = new List<string>();
-            List<List<string>> substringList = new List<List<string>>();
-            string previousLine = string.Empty;
+            }                      
+            
+            List<List<string>> substringList = new List<List<string>>();            
 
             foreach (var line in textFileLines)
             {
-                // empty the list
-                substringList_line.Clear();
-                // remove uncecessary characters
-                line.Trim();
-                
+
 
                 var lineSize = line.Length;
-                var tempList = new List<string>();
-                
-                for (int substringLength = 4; substringLength < line.Length; substringLength++)
+                var tempList = new Dictionary<string, int>();
+
+
+                for (int substringLength = 4; substringLength < lineSize; substringLength++)
                 {
-           
-                    // if the substring length is bigger than half of the line, we stop searching
-                    // substring cannot be bigger than main string
-                    // we break, because we go from smallest to biggest
-                    if (substringLength > line.Length+1 / 2) break;
 
+                    /// if the substring length is bigger than half of the line, we stop searching
+                    /// substring cannot be bigger than main string
+                    /// we BREAK, because we go from smallest to biggest
+                    if (substringLength > line.Length + 1 / 2) break;
+
+                    // we check per line 
                     for (int i = 0; i < lineSize; i++)
-                    {
-                        if (i + substringLength >= lineSize) break;
+                    {                      
+                        if (i + substringLength > lineSize) break;                        
+                        var substring = line.Substring(i, substringLength);                      
+                        var substringOccurence = StringUtil.CountSubstringOccurence(line, substring);
 
-                        // create the substring we are searching for
-                        var substring = line.Substring(i, substringLength);                     
+                        if (substringOccurence > 1)
+                            tempList.TryAdd(substring, substringOccurence);
 
-                        // remove the substring from the list so
-                        // var lineContentSubstring = line.Remove(i,substringLength);
-
-                        // if text contains substring at least once, then add
-                        //if (lineContentSubstring.ToLowerInvariant().Contains(substring.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase))
-                        if(StringUtil.CountSubstringOccurence(line,substring) > 1 )
-                        {           
-                            
-
-                        }
                     }
-
-                    // if the temp list is empty no substrings were found so we go to the new line
-                    if (tempList.Count == 0)
-                    {
-                        break;
-                    }
-
-                    // add relevant substrings to list
-                    substringList_line.AddRange(tempList);
-                    // clear temp list
-                    tempList.Clear();
-
                 }
 
-                // add the list to the list and clear
-                substringList.Add(new List<string>(substringList_line));
-                substringList_line.Clear();
+                foreach(var kvp in new Dictionary<string,int>(tempList).OrderBy(x => x.Key.Length))
+                {
+                    var key = kvp.Key;
+                    var value = kvp.Value;
 
-                // end of initial loop
+                    if (tempList.Any(x => x.Key.Contains(key) && x.Value >= value && x.Key != key))
+                        tempList.Remove(key);
+                }
+
+
+                substringList.Add(new List<string>(tempList.Keys));
+                tempList.Clear();
             }
 
             OutputResult(substringList, Search_type.SMALL_TO_BIG);
