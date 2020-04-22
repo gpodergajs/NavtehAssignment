@@ -1,9 +1,11 @@
 ﻿using NavtehAssignment.src._utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace NavtehAssignment
 {
@@ -25,7 +27,7 @@ namespace NavtehAssignment
                 _textFileContent = FileUtil.ReadFile(input).Trim();             
                 
                 FromBiggestToSmallest();
-                FromSmallestToBiggest();
+                //FromSmallestToBiggest();
 
             }
             catch (Exception e)
@@ -39,34 +41,35 @@ namespace NavtehAssignment
         {
 
             string[] textFileLines = new string[_textFileLines.Length];
+       
             // string comparison is bugged, so we lowercase the strings
             for(int i = 0; i < textFileLines.Length; i++)
             {
                 textFileLines[i] = _textFileLines[i].Trim().ToLowerInvariant();
-            }
-            
-            List<string> substringList_line = new List<string>();
-            List<List<string>> substringList = new List<List<string>>();
-            string previousLine = String.Empty;
+            }           
+       
+            List<List<string>> substringList = new List<List<string>>();       
 
             foreach (var line in textFileLines)
             {
                 var lineSize = line.Length;
-                var tempList = new List<string>();
+                var tempList = new Dictionary<string, int>();               
 
                 // we begin with the biggest substring length
                 for (int substringLength = line.Length; substringLength > 0; substringLength--)
                 {
                     // if smaller than 4 we go to next line and save all the substrigs
 
-                    // if the substring length is bigger than half of the line, we stop searching
-                    // substring cannot be bigger than main string
-                    // we continue, because we go from bigest to smallest
+                    /// if the substring length is bigger than half of the line, we stop searching
+                    /// substring cannot be bigger than main string
+                    /// we continue, because we go from bigest to smallest
                     if (substringLength > line.Length+1 / 2) continue;
 
+                    // if under the threshold - stop
                     if (substringLength < 4)
                     {
-                        substringList.Add(new List<string>(tempList));
+    
+                        substringList.Add(new List<string>(tempList.Keys));
                         tempList.Clear();
                         break;
                     }
@@ -75,23 +78,41 @@ namespace NavtehAssignment
                     for (int i = 0; i < lineSize; i++)
                     {
                         // if the line size is smaller then the substring we break
-                        // this usually mean we start at the end of the line when it passes
+                        // this usually means we start at the end of the line when it passes
                         if (i + substringLength > lineSize) break;
 
-                        // the beggining substring is the whole line
-                        var substring = line.Substring(i, substringLength);
-                        
-                        // we remove the substring from the line text (so we dont get a match with the same substring) 
-                        var lineContentSubstring = line.Remove(i, substringLength);
+                        // the beginning substring is the whole line
+                        var substring = line.Substring(i, substringLength);                        
+                        // how many times the substring occurs in the line (or text)
+                        var substringOccurence = StringUtil.CountSubstringOccurence(line, substring);
 
-                        // if text contains substring at least once, then add
-                        if (lineContentSubstring.Contains(substring, StringComparison.OrdinalIgnoreCase))
+                        if (substringOccurence > 1)
                         {
-                            if (!tempList.Contains(substring))
+                         
+                            if (!tempList.Any(x => x.Key.Contains(substring)))
+                                tempList.Add(substring, substringOccurence);
+                         
+                            // we create a new dictionary, that has items that have this substring
+                            var substringOverlapDictionary = tempList.Where(x => x.Key.Contains(substring));
+
+                            /// we go through all the items in the dictionary
+                            /// we check if it occurs more times than any other item
+                            /// if it occurs more times, we add
+                            foreach (var kvPair in new Dictionary<string, int>(substringOverlapDictionary.OrderBy(x => x.Key.Length)))
                             {
-                                // TODO: you could the overlap check here to optimize algo
-                                substringList_line.Add(substring);
-                                tempList.Add(substring);
+                                var key = kvPair.Key;
+                                var value = kvPair.Value;
+
+                                if (value < substringOccurence)
+                                {
+                                    // if we are at the last item
+                                    if (key.Equals(substringOverlapDictionary.Last().Key))
+                                    {
+                                        tempList.Add(substring, substringOccurence);
+                                    };
+                                    break;
+                                }
+                                else continue;
                             }
                         }
                     }
@@ -144,15 +165,14 @@ namespace NavtehAssignment
                         var substring = line.Substring(i, substringLength);                     
 
                         // remove the substring from the list so
-                        var lineContentSubstring = line.Remove(i,substringLength);
+                        // var lineContentSubstring = line.Remove(i,substringLength);
 
                         // if text contains substring at least once, then add
-                        if (lineContentSubstring.ToLowerInvariant().Contains(substring.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase))
-                        {
-                            // check if already exists and add
-                            // TODO: we could add the overlap check here to optimize algo
-                            if (!tempList.Contains(substring))
-                                tempList.Add(substring);
+                        //if (lineContentSubstring.ToLowerInvariant().Contains(substring.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase))
+                        if(StringUtil.CountSubstringOccurence(line,substring) > 1 )
+                        {           
+                            
+
                         }
                     }
 
@@ -184,12 +204,6 @@ namespace NavtehAssignment
             List<List<string>> resultList = new List<List<string>>();
             var sb = new StringBuilder();
 
-            foreach (var listItem in substringList)
-            {
-                resultList.Add(new List<string>(ListUtil.RemoveOverlappedStrings(ListUtil.OrderByLength(listItem))));
-            }
-
-
             switch (sType)
             {
                 case Search_type.BIG_TO_SMALL: Console.WriteLine("Big to small"); break;
@@ -197,10 +211,7 @@ namespace NavtehAssignment
                 default: Console.WriteLine("Sword of a thousand truths"); break; 
             }
 
-            
-
-
-            foreach (var listItem in resultList)
+            foreach (var listItem in substringList)
             {
                 if (listItem.Count == 0) continue;
 
