@@ -28,6 +28,7 @@ namespace NavtehAssignment
                 
                 FromBiggestToSmallest();
                 FromSmallestToBiggest();
+                Console.ReadKey();
 
             }
             catch (Exception e)
@@ -98,7 +99,7 @@ namespace NavtehAssignment
                             /// we go through all the items in the dictionary
                             /// we check if it occurs more times than any other item
                             /// if it occurs more times, we add
-                            foreach (var kvPair in new Dictionary<string, int>(substringOverlapDictionary))
+                            foreach (var kvPair in new Dictionary<string, int>(substringOverlapDictionary).OrderBy(x => x.Key.Length))
                             {
                                 var key = kvPair.Key;
                                 var value = kvPair.Value;
